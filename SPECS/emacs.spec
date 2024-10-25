@@ -5,7 +5,7 @@ Summary:       GNU Emacs text editor
 Name:          emacs
 Epoch:         1
 Version:       26.1
-Release:       7%{?dist}.1
+Release:       12%{?dist}
 License:       GPLv3+ and CC0-1.0
 URL:           http://www.gnu.org/software/emacs/
 Group:         Applications/Editors
@@ -24,7 +24,14 @@ Source10:      package-keyring.gpg
 # rhbz#713600
 Patch1:        emacs-spellchecker.patch
 Patch2:        emacs-system-crypto-policies.patch
-Patch3:        emacs-ob-latex-command-injection-vulnerability.patch
+Patch3:        emacs-ctags-local-command-execute-vulnerability.patch
+Patch4:        emacs-mh-rmail-nonempty-dir.patch
+Patch5:        emacs-etags-local-command-injection-vulnerability.patch
+Patch6:        emacs-htmlfontify-command-injection-vulnerability.patch
+Patch7:        emacs-ob-latex-command-injection-vulnerability.patch
+Patch8:        emacs-consider-org-file-contents-unsafe.patch
+Patch9:        emacs-org-link-expand-abbrev-unsafe-elisp.patch
+Patch10:       emacs-mark-contents-untrusted.patch
 
 BuildRequires: atk-devel
 BuildRequires: cairo-devel
@@ -64,7 +71,6 @@ BuildRequires: desktop-file-utils
 BuildRequires: libacl-devel
 
 BuildRequires: gtk3-devel
-BuildRequires: webkit2gtk3-devel
 
 # For lucid
 BuildRequires: Xaw3d-devel
@@ -179,7 +185,14 @@ packages that add functionality to Emacs.
 
 %patch1 -p1 -b .spellchecker
 %patch2 -p1 -b .system-crypto-policies
-%patch3 -p1 -b .ob-latex-command-injection-vulnerability
+%patch3 -p1 -b .ctags-local-command-execute-vulnerability
+%patch4 -p1 -b .mh-rmail-nonempty-dir.patch
+%patch5 -p1 -b .etags-local-command-injection-vulnerability
+%patch6 -p1 -b .htmlfontify-command-injection-vulnerability
+%patch7 -p1 -b .ob-latex-command-injection-vulnerability
+%patch8 -p1 -b .consider-org-file-contents-unsafe
+%patch9 -p1 -b .org-link-expand-abbrev-unsafe-elisp
+%patch10 -p1 -b .mark-contents-untrusted
 autoconf
 
 # We prefer our emacs.desktop file
@@ -235,7 +248,7 @@ ln -s ../configure .
 
 %configure --with-dbus --with-gif --with-jpeg --with-png --with-rsvg \
            --with-tiff --with-xft --with-xpm --with-x-toolkit=gtk3 --with-gpm=no \
-           --with-xwidgets --with-modules
+           --with-modules
 make bootstrap
 %{setarch} make %{?_smp_mflags}
 cd ..
@@ -466,8 +479,25 @@ fi
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
-* Thu Apr 6 2023 Jacek Migacz <jmigacz@redhat.com> - 1:26.1-7.1
-- Fix ob-latex.el command injection vulnerability (#2180585)
+* Fri Aug 23 2024 Jacek Migacz <jmigacz@redhat.com> - 1:26.1-12
+- org-file-contents: Consider all remote files unsafe (CVE-2024-30205)
+- org-link-expand-abbrev: Do not evaluate arbitrary unsafe Elisp code (CVE-2024-39331)
+- Make Gnus treats inline MIME contents as untrusted (CVE-2024-30203)
+- Disable xwidgets (RHEL-14549)
+
+* Wed Apr 12 2023 Jacek Migacz <jmigacz@redhat.com> - 1:26.1-11
+- Bump version
+
+* Fri Apr 7 2023 Jacek Migacz <jmigacz@redhat.com> - 1:26.1-10
+- Fix etags local command injection vulnerability (#2175189)
+- Fix htmlfontify.el command injection vulnerability (#2175178)
+- Fix ob-latex.el command injection vulnerability (#2180587)
+
+* Tue Jan 10 2023 Jacek Migacz <jmigacz@redhat.com> - 1:26.1-9
+- Fix MH-E mail composition with GNU Mailutils (#1991156)
+
+* Thu Jan 05 2023 Jacek Migacz <jmigacz@redhat.com> - 1:26.1-8
+- Fix ctags local command execute vulnerability (#2149386)
 
 * Thu Aug 5 2021 Jacek Migacz <jmigacz@redhat.com> - 1:26.1-7
 - provide gating.yaml for CI
